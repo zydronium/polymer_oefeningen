@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link  rel="import" href="name-badge.html"/>
+  </head>
+  <body>
+    <div><h1>Polymer Trainer List</h1></div>
+    <hr>
+    <name-badge></name-badge>
+    <br>
+    <name-badge contactname="Another User"></name-badge>
+
+    <script>
+    (function() {
+  if ('registerElement' in document
+      && 'import' in document.createElement('link')
+      && 'content' in document.createElement('template')) {
+    // platform is good!
+  } else {
+    // polyfill the platform!
+    var e = document.createElement('script');
+    e.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+    document.body.appendChild(e);
+  }
+})();
+    </script>
+  </body>
+</html>
