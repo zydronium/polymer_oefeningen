@@ -1,0 +1,61 @@
+<link rel="import" href="https://polygit2.appspot.com/components/polymer/polymer.html">
+<link rel="import" href="highlight.html">
+<dom-module is="product-detail">
+    <template>
+        <style>
+            :host { display:block;}
+            :host.highlighted { background-color: red}
+        </style>
+        <h1>{{ title}}</h1>
+        <hr>
+        <p> {{ details }}</p>
+        <div class="buttons">
+            Current stock: {{ stock }} <br>
+        </div>
+        <button disabled$="{{isOutOfStock}}" on-click="buy">Buy this product</button>
+    </template>
+    <script>
+    Polymer({
+        is:'product-detail',
+        properties:{
+            stock:{
+                type:Number, 
+                value:10,
+                notify:true,
+            },
+            details: {
+                type:String, 
+                value:'Fuck apple',
+            },
+            title: {
+                type:String, 
+                value:'OnePlus 3',
+                notify:true,
+            },
+            isOutOfStock: {
+                type:Boolean,
+                notify:true,
+                computed: 'computedStock(stock)',
+                observer: '_stockChanged'
+            }
+        },
+        computedStock: function(stock) {
+            return stock <= 0;
+        },
+        buy: function(){
+            this.fire('bought', {});
+            this.stock--;
+        },
+        addStock: function(value){
+            this.stock += value;
+        },
+        _stockChanged: function(newValue, oldValue) {
+            if(newValue) {
+                this.fire('outofstock', {});
+            }
+        },
+        behaviors: [HighlightBehavior]
+    });
+ 
+  </script>
+</dom-module>
