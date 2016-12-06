@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="import" href="https://polygit2.appspot.com/components/polymer/polymer.html">
+        <link rel="import" href="product/product-details.html">
+    </head>
+    <body>
+        <dom-module id="my-app">
+        <template>
+            <product-detail on-bought="_bought" on-outofstock="_outofstock"></product-detail>
+        </template>
+        <script>          
+            Polymer({
+                is:'my-app',
+                _outofstock:function(){ console.log("product out of stock")},
+                _bought:function(){ console.log("product bought")}
+            })
+        </script>
+    </dom-module>
+    <my-app><my-app>
+    </body>
+</html>
