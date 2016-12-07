@@ -1,0 +1,14 @@
+{
+  "name": "template-helpers",
+  "homepage": "https://github.com/CodingContraption/Polymer-Oefeningen",
+  "authors": [
+    "Martin Luhrman <martin@luhrman.eu>"
+  ],
+  "version": "1.0.0",
+  "dependencies": {
+    "polymer": "^1.7.0",
+    "iron-elements": "^1.0.10",
+    "paper-elements": "^1.0.7",
+    "neon-animation": "^1.2.4"
+  }
+}

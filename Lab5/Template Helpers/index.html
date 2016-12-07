@@ -3,20 +3,61 @@
 
 <head>
     <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="app-theme.html">
+    <link rel="import" href="bower_components/paper-elements/paper-elements.html">
+    <link rel="import" href="bower_components/iron-elements/iron-elements.html">
+    <link rel="import" href="bower_components/neon-animation/neon-animated-pages.html">
 </head>
 
-<body>
+<body class="fullbleed layout vertical">
+    <app-theme></app-theme>
+    <paper-header-panel>
+        <my-app></my-app>
+    </paper-header-panel>
     <dom-module is="dom-bind" id="my-app">
     <template>
-        <h1>{{message}}</h1>
+        <style>
+            neon-animated-pages {
+                /*flex: 1 1 auto;*/
+                height:250px;
+            }
+        </style>
+        <paper-toolbar>
+            <div class="title">{{message}}</div>
+        </paper-toolbar>
         <template is="dom-if" if="{{winner}}">
             <h2>Winner: {{winner}} </h2>
         </template>
-        <div><strong>Candidates:</strong>
-            <template is="dom-repeat" items="[[candidates]]">
-                <button on-click="vote">{{item.name}} {{item.lastname}}</button>
-            </template>
-        </div>
+         <neon-animated-pages selected="0" id="pages" entry-animation="entry" exit-animation="exit">
+            <div><strong>Candidates:</strong>
+                <iron-list grid items="[[candidates]]" as="item" id="candidateGrid">
+                    <template>
+                        <style>
+                            paper-card + paper-card {margin-left: 20px !important;}
+                        </style>
+                        <paper-card heading="Vote for" style="margin-top:2px;zoom:96%;width:45%;">
+                            <div class="card-content">[[item.name]] [[item.lastname]]</div>
+                            <div class="card-actions">
+                                <paper-icon-button on-tap="_showInfo" icon="info-outline"></paper-icon-button>
+                                <paper-fab on-tap="vote" mini icon="star" style="float:right;margin-bottom:5px;"></paper-fab>
+                            </div>
+                        </paper-card>
+                    </template>
+                </iron-list>
+            </div>
+            <div>
+                <paper-card style="margin-top:2px;margin-left:10px;zoom:96%;width:45%;">
+                    <div class="card-content">
+                    <div class="header">[[selectedCandidate.name]] [[selectedCandidate.lastname]] </div>
+                    <p>Biography for....</p>
+                    </div>
+                    <div class="card-actions">
+                    <p>Current votecount: {{_voteCount(selectedCandidate, votes.*)}} </p>
+                    <paper-button on-tap="_goBack">Back</paper-button>
+                    </div>
+                </paper-card>
+            </div>
+         </neon-animated-pages>
         <div><strong>Votes:</strong>
             <template is="dom-repeat" items="[[votes]]" sort="_getSort">
                 <br>{{item.candidate.name}} {{item.candidate.lastname}} - {{item.time}} 
@@ -29,11 +70,44 @@
                 properties:{
                     winner:{
                         type:String
+                    },
+                    selectedCandidate: {
+                        type:Object
+                    },
+                    animationConfig: {
+                        value: function() {
+                            return {
+                                'entry': {
+                                    // provided by neon-animation/animations/scale-up-animation.html
+                                    name: 'scale-up-animation',
+                                    node: this.$.pages
+                                },
+                                'exit': {
+                                    // provided by neon-animation-animations/fade-out-animation.html
+                                    name: 'fade-out-animation',
+                                    node: this.$.pages
+                                },
+                                'vote':{ 
+                                    name: 'scale-down-animation', 
+                                    node: this.$.candidateGrid
+                                },
+                            }
+                        }
                     }
                 },
+                listeners: {
+                    'neon-animation-finish': '_onNeonAnimationFinish'
+                },
+                _onNeonAnimationFinish: function() {
+                    if (!this.opened) {
+                    this.style.display = 'none';
+                    }
+                },
+                behaviors: [ Polymer.NeonAnimatableBehavior ],
                 vote: function(){
                     this.push('votes', new Vote(event.model.item, new Date().toLocaleTimeString()));
                     if (this.votes.length > 10) this.winner = this.getWinner();
+                    this.playAnimation('vote');
                 },
                 getWinner: function(){
                     var filtered = this.votes.filter(function(item){
@@ -46,11 +120,24 @@
                 _getSort: function(a, b){
                     return b.created - a.created;
                 },
-                });
+                _showInfo: function(){
+                    this.selectedCandidate = event.model.item;
+                    this.$.pages.selected = 1;
+                },
+                _goBack: function(){
+                    this.selectedCandidate = {};
+                    this.$.pages.selected = 0;
+                },
+                 _voteCount: function(candidate, votes){
+                    return  this.votes.filter(function(item){ 
+                        return  item.candidate == candidate;
+                    }).length;
+                },
+            });
     </script>
     </dom-module>
 
-    <my-app></my-app>
+    
 
     <script>
         var Candidate = function(name, lastname){
